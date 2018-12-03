@@ -15,20 +15,22 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 include(cmake/glad_glfw.cmake)
 include(cmake/utils.cmake)
+include(cmake/freetype.cmake)
 
 set(PROJECT_NAME fortress-commander)
 project(${PROJECT_NAME})
 
 set(SRC_FILES
   glad/src/glad.c
-  src/ResourceManager.cpp
-  src/Shader.cpp
+  src/Graphics/ResourceManager.cpp
+  src/Graphics/Shader.cpp
+  src/Graphics.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
 
 setup_glad_glfw(${PROJECT_NAME})
-
+setup_freetype(${PROJECT_NAME})
 
 # copy over resources
 copy_to_bin_dir(shaders textures)

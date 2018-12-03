@@ -1,7 +1,10 @@
 #include "ResourceManager.h"
 #include <string>
 
-std::array<Shader, 1> ResourceManager::_shaders = {std::string("4.1.texture")};
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+// Texture2D* ResourceManager::_atlas = nullptr;
 
 Shader& ResourceManager::getShader(SHADER_INDEX i) {
   Shader& s = _shaders[static_cast<std::size_t>(i)];
