@@ -26,6 +26,6 @@ buildfolder:
 clean:
 	rm -rf build
 
-.PHONY: gdb
-gdb:
-	gdb build/fortress-commander
+graphics:
+	cd build; rm -rf Graphics
+	cp -r ../fortress-commander/src/Graphics src

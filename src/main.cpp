@@ -1,45 +1,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Graphics.h"
-#include "Graphics/stb_image.h"
+// #include "Graphics.h"
+#include "Graphics/RenderWindow.h"
+#include "Graphics/ResourceManager.h"
+
+#include "Graphics/Texture.h"
 
 #include <iostream>
-
-struct Texture {
-  uint id;
-  int width;
-  int height;
-
-  Texture() {
-    // load and create a texture 
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
-    // set the texture wrapping parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    // set texture filtering parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load image, create texture and generate mipmaps
-    int nrChannels;
-    unsigned char *data = stbi_load("textures/textures.png", &width, &height, &nrChannels, 4);
-
-    if (nrChannels == 3) {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    } else if (nrChannels == 4) {
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    }
-    if (data) {
-      glGenerateMipmap(GL_TEXTURE_2D);
-
-      std::cout << "nrChannels " << nrChannels << std::endl;
-    } else {
-      std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-  }
-};
 
 struct Instance {
   float x;
@@ -50,6 +18,10 @@ struct Instance {
 int main() {
   RenderWindow window("Texture Example");
   auto& shader = ResourceManager::getShader(SHADER_INDEX::TEXTURE);
+
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   float textureCount = 5;
 
@@ -67,10 +39,10 @@ int main() {
 
   Instance instances[] = {
     {.x = 1, .y = 1, .texOffset = 0},
-    {.x = 5, .y = 1, .texOffset = 1 / textureCount},
-    {.x = 8, .y = 1, .texOffset = 2 / textureCount},
     {.x = 3, .y = 1, .texOffset = 1 / textureCount},
-    {.x = 5, .y = 7, .texOffset = 3 / textureCount},
+    {.x = 5, .y = 1, .texOffset = 2 / textureCount},
+    {.x = 7, .y = 1, .texOffset = 3 / textureCount},
+    {.x = 1, .y = 7, .texOffset = 4 / textureCount},
   };
   
   uint VAO; // vertex array object
@@ -115,6 +87,11 @@ int main() {
 
   shader.use();
   shader.setMat4("projection", view.proj());
+
+  glDisable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   while (window.isOpen()) {
     // render
