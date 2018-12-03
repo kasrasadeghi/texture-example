@@ -9,10 +9,19 @@
 
 #include <iostream>
 
+#include <glm/common.hpp>
+// #include <glm/vec3.hpp>
+
+struct TextureBatch {
+
+};
+
 struct Instance {
-  float x;
-  float y;
-  float texOffset;
+  glm::vec2 pos;
+  glm::vec2 size;
+  glm::vec4 aColor;
+  float texOffset = 0;
+  float rotation = 0;
 };
 
 int main() {
@@ -26,11 +35,11 @@ int main() {
   float textureCount = 5;
 
   float vertices[] = {
-    // positions     // colors           // texture coords
-    -0.5f, -0.5f,    0.0f, 0.0f, 1.0f,   0.0f,                0.0f, // bottom left
-    -0.5f,  0.5f,    1.0f, 1.0f, 0.0f,   0.0f,                1.0f, // top left 
-     0.5f, -0.5f,    0.0f, 1.0f, 0.0f,   1.0f / textureCount, 0.0f, // bottom right
-     0.5f,  0.5f,    1.0f, 0.0f, 0.0f,   1.0f / textureCount, 1.0f, // top right
+    // positions     // texture coords
+    -0.5f, -0.5f,    0.0f,                0.0f, // bottom left
+    -0.5f,  0.5f,    0.0f,                1.0f, // top left 
+     0.5f, -0.5f,    1.0f / textureCount, 0.0f, // bottom right
+     0.5f,  0.5f,    1.0f / textureCount, 1.0f, // top right
   };
 
   auto view = View()
@@ -38,11 +47,7 @@ int main() {
     .radius(10, 10);
 
   Instance instances[] = {
-    {.x = 1, .y = 1, .texOffset = 0},
-    {.x = 3, .y = 1, .texOffset = 1 / textureCount},
-    {.x = 5, .y = 1, .texOffset = 2 / textureCount},
-    {.x = 7, .y = 1, .texOffset = 3 / textureCount},
-    {.x = 1, .y = 7, .texOffset = 4 / textureCount},
+    {.pos = {10, 10}, .size = {1, 1}, .aColor = {1, 1, 1, 1}}
   };
   
   uint VAO; // vertex array object
@@ -57,13 +62,10 @@ int main() {
   {// global attributes
     // position attribute
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
-    // color attribute
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(2 * sizeof(float)));
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
     // texture coord attribute
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(5 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
   }
 
   uint IBO; // instanced vertex buffer object
@@ -71,15 +73,37 @@ int main() {
   glBindBuffer(GL_ARRAY_BUFFER, IBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(instances), instances, GL_STATIC_DRAW);
   {// instance attributes
-    // position offset attribute
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)0);
-    glVertexAttribDivisor(3, 1);
 
-    // texture coord attribute
-    glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)(2 * sizeof(float)));
-    glVertexAttribDivisor(4, 1);
+    int currentAttr = 2;
+    // posOffset
+    glEnableVertexAttribArray(currentAttr);
+    glVertexAttribPointer(currentAttr, 2, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)0);
+    glVertexAttribDivisor(currentAttr, 1);
+    currentAttr++;
+
+    // size
+    glEnableVertexAttribArray(currentAttr);
+    glVertexAttribPointer(currentAttr, 2, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)(2 * sizeof(float)));
+    glVertexAttribDivisor(currentAttr, 1);
+    currentAttr++;
+
+    // aColor
+    glEnableVertexAttribArray(currentAttr);
+    glVertexAttribPointer(currentAttr, 4, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)(4 * sizeof(float)));
+    glVertexAttribDivisor(currentAttr, 1);
+    currentAttr++;
+
+    // texOffset
+    glEnableVertexAttribArray(currentAttr);
+    glVertexAttribPointer(currentAttr, 1, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)(8 * sizeof(float)));
+    glVertexAttribDivisor(currentAttr, 1);
+    currentAttr++;
+
+    // rotation
+    glEnableVertexAttribArray(currentAttr);
+    glVertexAttribPointer(currentAttr, 1, GL_FLOAT, GL_FALSE, sizeof(Instance), (void*)(9 * sizeof(float)));
+    glVertexAttribDivisor(currentAttr, 1);
+    currentAttr++;
   }
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 

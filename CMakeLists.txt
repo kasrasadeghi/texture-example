@@ -24,7 +24,6 @@ set(SRC_FILES
   glad/src/glad.c
   src/Graphics/ResourceManager.cpp
   src/Graphics/Shader.cpp
-  src/Graphics.cpp
 )
 
 add_executable(${PROJECT_NAME} src/main.cpp ${SRC_FILES})
